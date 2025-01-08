@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recomendation-service-deploy
+  namespace: amazon-recomendation-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: recomendation-service-pod
+  template:
+    metadata:
+      labels:
+        app: recomendation-service-pod
+    spec:
+      containers:
+      - name: recomendation-service
+        image: lantum1/amazon-recomendation-service:v1.01
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "200Mi"
+          limits:
+            memory: "400Mi"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: recomendation-service-hpa
+  namespace: amazon-recomendation-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: recomendation-service-deploy
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

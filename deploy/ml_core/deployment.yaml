@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-core-deploy
+  namespace: amazon-recomendation-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ml-core-pod
+  template:
+    metadata:
+      labels:
+        app: ml-core-pod
+    spec:
+      containers:
+      - name: ml-core
+        image: lantum1/amazon-recomendation-ml-core:v1.01
+        ports:
+        - containerPort: 50051
+        volumeMounts:
+        - mountPath: /app/model
+          name: ml-core-volume
+        resources:
+          requests:
+            memory: "5500Mi"
+          limits:
+            memory: "6Gi"
+      volumes:
+      - name: ml-core-volume
+        persistentVolumeClaim:
+          claimName: ml-core-pvc
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ml-core-hpa
+  namespace: amazon-recomendation-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ml-core-deploy
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80

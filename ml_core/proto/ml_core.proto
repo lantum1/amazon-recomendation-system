@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package modelservice;
+
+message InferenceRequest {
+  string user_id = 1;
+  string item_id = 2;
+}
+
+message InferenceResponse {
+  double prediction = 1;
+}
+
+service ModelService {
+  rpc Predict (InferenceRequest) returns (InferenceResponse);
+}

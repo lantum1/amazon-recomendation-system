@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-core-service
+  namespace: amazon-recomendation-system
+spec:
+  type: ClusterIP
+  clusterIP: 10.96.130.247
+  ports:
+  - protocol: TCP
+    port: 50051
+  selector:
+    app: ml-core-pod
