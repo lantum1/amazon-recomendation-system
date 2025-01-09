@@ -1,25 +1,12 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException, Query, status
+from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from pydantic.generics import GenericModel
-from typing import Generic, TypeVar, Optional
+from dto.ErrorResponse import ErrorResponse
+from dto.ResponseApi import ResponseApi
+from dto.GetProductRatingResponse import GetProductRatingResponse
 import grpc
 import ml_core_pb2
 import ml_core_pb2_grpc
-
-T = TypeVar("T")
-
-class ResponseApi(GenericModel, Generic[T]):
-    data: Optional[T]
-    error: Optional["ErrorResponse"]
-
-class ErrorResponse(BaseModel):
-    code: int
-    description: str
-
-class GetProductRatingResponse(BaseModel):
-    productRating: float
 
 app = FastAPI()
 
@@ -75,4 +62,4 @@ def get_product_rating(user_id: str, product_id: str) -> ResponseApi[GetProductR
         )
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8080, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
